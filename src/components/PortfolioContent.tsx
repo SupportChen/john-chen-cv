@@ -9,55 +9,65 @@ export default function PortfolioContent({ projects }: { projects: any[] }) {
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const springConfig = { type: "spring" as const, stiffness: 300, damping: 30 };
+
   const openProject = (proj: any) => {
     setSelectedProject(proj);
     setCurrentImageIndex(0);
   };
 
   return (
-    <div className="pt-24 min-h-screen bg-[#0a0a0a] z-10 w-full overflow-x-hidden">
-      <header className="px-8 lg:px-16 py-12 flex justify-between items-baseline border-b border-[#111]">
-        <h2 className="text-3xl lg:text-4xl font-extralight tracking-[0.2em] uppercase italic">PROJECTS</h2>
-        <span className="text-[10px] font-mono text-[#333] tracking-[0.4em] uppercase">Phase_01 / Research & Practice</span>
+    <div className="pt-24 min-h-screen z-10 w-full overflow-x-hidden pb-40 text-white">
+      <header className="px-8 lg:px-20 py-20 flex flex-col md:flex-row justify-between items-end gap-12">
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-1 bg-klein rounded-full" />
+            <span className="text-[11px] font-bold text-klein tracking-[0.5em] uppercase">Archive Collection</span>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-bold tracking-tight leading-tight">Projects</h2>
+          <p className="text-silver/60 max-w-md text-sm font-light leading-relaxed">数字化设计咨询与建筑科技研发集合，探索逻辑与美学的平衡点。</p>
+        </div>
+        <div className="hidden lg:flex flex-col items-end gap-2 opacity-20">
+           <span className="text-[10px] font-bold tracking-[0.4em] uppercase">Phase_Practice</span>
+           <div className="h-px w-24 bg-white" />
+        </div>
       </header>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 px-8 lg:px-16 pb-32">
-        {projects.map((proj: any) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-14 px-8 lg:px-20">
+        {projects.map((proj: any, i: number) => (
           <motion.div 
             key={proj._id} 
-            layoutId={proj._id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: i * 0.1, ease: [0.23, 1, 0.32, 1] }}
             onClick={() => openProject(proj)}
-            className="group relative aspect-[16/11] bg-[#000] overflow-hidden cursor-pointer"
+            className="group relative aspect-[4/3] rounded-[48px] overflow-hidden cursor-pointer glass border border-white/5 shadow-2xl transition-all duration-500 hover:shadow-3xl hover:border-white/20"
           >
-            {/* 背景底图 - 高级灰/透明度处理 */}
-            <div className="absolute inset-0 z-0 opacity-30 group-hover:opacity-10 transition-all duration-1000">
+            {/* 背景底图 - 由黑白变彩色 */}
+            <div className="absolute inset-0 z-0">
               {proj.media && proj.media[0] ? (
                 <Image 
                   src={urlFor(proj.media[0]).toString()} 
                   alt={proj.title} 
                   fill 
                   unoptimized
-                  className="object-cover grayscale group-hover:grayscale-0 scale-100 group-hover:scale-105 transition-transform duration-[2s] ease-out"
+                  className="object-cover transition-all duration-[2s] ease-out scale-100 group-hover:scale-110 grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100"
                 />
               ) : (
-                <div className="w-full h-full bg-[#080808]" />
+                <div className="w-full h-full bg-white/[0.02]" />
               )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent opacity-60 group-hover:opacity-10 transition-opacity duration-1000" />
             </div>
             
-            {/* 核心交互层 - 标题布满逻辑 */}
-            <div className="absolute inset-0 flex items-center justify-center z-10 p-8 lg:p-12">
-               <div className="text-center w-full group-hover:scale-[1.02] transition-transform duration-700">
-                  <span className="block text-[8px] font-mono text-[#444] mb-4 tracking-[0.8em] group-hover:text-[#666] transition-colors uppercase">
-                    ID. {proj.year}
-                  </span>
-                  
-                  {/* 字号进一步精细化，但放宽 max-width 让文字布满中轴 */}
-                  <h3 className="text-[clamp(0.8rem,1.2vw,1.1rem)] font-light tracking-[0.3em] leading-[1.8] text-white/80 group-hover:text-white transition-all uppercase px-4 w-full">
-                    {proj.title}
-                  </h3>
-                  
-                  <div className="w-4 h-px bg-white/5 mt-8 mx-auto group-hover:w-full group-hover:bg-white/20 transition-all duration-1000" />
-               </div>
+            {/* 内容层 - 极简标题布局 */}
+            <div className="absolute inset-x-0 bottom-0 p-12 z-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-700">
+              <span className="text-[11px] font-bold text-klein tracking-[0.3em] mb-3 uppercase drop-shadow-[0_0_12px_rgba(0,47,167,0.5)] block">
+                {proj.year}
+              </span>
+              <h3 className="text-xl md:text-2xl font-bold tracking-tight leading-snug text-white/80 group-hover:text-white transition-colors">
+                {proj.title}
+              </h3>
+              <div className="mt-8 h-px w-0 group-hover:w-full bg-gradient-to-r from-klein to-transparent transition-all duration-1000" />
             </div>
           </motion.div>
         ))}
@@ -65,48 +75,58 @@ export default function PortfolioContent({ projects }: { projects: any[] }) {
 
       <AnimatePresence>
         {selectedProject && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-24">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-12 lg:p-24 overflow-hidden">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedProject(null)}
-              className="absolute inset-0 bg-[#0a0a0a]/95 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 backdrop-blur-xl"
             />
             
             <motion.div 
-              layoutId={selectedProject._id}
-              className="relative w-full max-w-7xl h-full bg-[#0a0a0a] border border-[#111] overflow-hidden flex flex-col lg:flex-row shadow-2xl"
+              initial={{ opacity: 0, scale: 0.9, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 40 }}
+              transition={springConfig}
+              className="relative w-full max-w-7xl h-full glass rounded-[54px] overflow-hidden flex flex-col lg:flex-row shadow-4xl border border-white/20"
             >
-              {/* 多图滑动翻页展示区 */}
-              <div className="w-full lg:w-3/4 h-1/2 lg:h-full relative bg-[#050505] flex items-center justify-center overflow-hidden group">
+              <button 
+                onClick={() => setSelectedProject(null)} 
+                className="absolute top-10 right-10 w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-full text-white/80 hover:text-white transition-all z-50 order-2 lg:order-none"
+              >
+                <span className="text-2xl leading-none">✕</span>
+              </button>
+
+              {/* 展示区 */}
+              <div className="w-full lg:w-[65%] h-1/2 lg:h-full relative bg-black/40 flex items-center justify-center overflow-hidden group">
                 {selectedProject.media && selectedProject.media.length > 0 ? (
                   <>
                     <AnimatePresence mode="wait">
                       <motion.div 
                         key={currentImageIndex}
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.02 }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                        className="relative w-full h-full flex items-center justify-center"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.8 }}
+                        className="relative w-full h-full"
                       >
                         <Image 
                           src={urlFor(selectedProject.media[currentImageIndex]).toString()} 
                           alt={`${selectedProject.title} - ${currentImageIndex}`} 
                           fill 
                           unoptimized
-                          className="object-contain p-4 lg:p-16"
+                          className="object-contain p-8 md:p-20"
                         />
                       </motion.div>
                     </AnimatePresence>
 
-                    {/* 页面指示器 (左上角) */}
-                    <div className="absolute top-6 left-6 z-20 bg-black/60 backdrop-blur-md px-4 py-2 border border-[#333] text-[10px] font-mono tracking-[0.3em] uppercase text-[#ccc]">
-                      IMG {currentImageIndex + 1} / {selectedProject.media.length}
+                    {/* 指示器 */}
+                    <div className="absolute top-10 left-12 z-20 glass px-6 py-2.5 rounded-full text-[11px] font-bold tracking-[0.3em] text-white/80">
+                      IMG {currentImageIndex + 1} <span className="opacity-20 px-2">/</span> {selectedProject.media.length}
                     </div>
 
-                    {/* 悬浮强感官翻页按钮 */}
+                    {/* 翻页 (大区域交互) */}
                     {selectedProject.media.length > 1 && (
                       <>
                         <button 
@@ -114,9 +134,9 @@ export default function PortfolioContent({ projects }: { projects: any[] }) {
                             e.stopPropagation();
                             setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : selectedProject.media.length - 1));
                           }}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-20 lg:w-16 lg:h-32 bg-black/40 hover:bg-white border border-[#333] hover:border-white text-white hover:text-black backdrop-blur-sm transition-all duration-300 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100"
+                          className="absolute left-8 top-1/2 -translate-y-1/2 w-16 h-16 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center z-20 transition-all opacity-0 group-hover:opacity-100"
                         >
-                          <span className="text-2xl font-light">←</span>
+                          <span className="text-3xl font-light">←</span>
                         </button>
 
                         <button 
@@ -124,53 +144,35 @@ export default function PortfolioContent({ projects }: { projects: any[] }) {
                             e.stopPropagation();
                             setCurrentImageIndex((prev) => (prev < selectedProject.media.length - 1 ? prev + 1 : 0));
                           }}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-20 lg:w-16 lg:h-32 bg-black/40 hover:bg-white border border-[#333] hover:border-white text-white hover:text-black backdrop-blur-sm transition-all duration-300 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100"
+                          className="absolute right-8 top-1/2 -translate-y-1/2 w-16 h-16 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center z-20 transition-all opacity-0 group-hover:opacity-100"
                         >
-                          <span className="text-2xl font-light">→</span>
+                          <span className="text-3xl font-light">→</span>
                         </button>
-                        
-                        {/* 底部进程点 */}
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20 bg-black/60 px-6 py-3 border border-[#333] backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          {selectedProject.media.map((_: any, idx: number) => (
-                            <button
-                              key={idx}
-                              onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(idx); }}
-                              className={`h-[2px] transition-all duration-300 ${idx === currentImageIndex ? 'w-8 bg-white' : 'w-4 bg-[#555] hover:bg-[#888]'}`}
-                            />
-                          ))}
-                        </div>
                       </>
                     )}
                   </>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-[#222]">
-                    NO_MEDIA_ASSETS_FOUND
-                  </div>
+                  <div className="text-[12px] font-bold text-silver/20 tracking-widest italic uppercase">No Media Loaded</div>
                 )}
               </div>
               
-              {/* 右侧固定说明栏 */}
-              <div className="w-full lg:w-1/4 h-1/2 lg:h-full p-8 lg:p-12 overflow-y-auto flex flex-col border-t lg:border-t-0 lg:border-l border-[#111] bg-[#0a0a0a]">
-                <div className="flex justify-between items-start mb-16">
-                   <div className="flex flex-col gap-2">
-                      <span className="text-[10px] font-mono text-[#444] tracking-[0.4em] uppercase">ID. {selectedProject.year}</span>
-                      <h2 className="text-2xl font-light tracking-widest uppercase leading-tight">{selectedProject.title}</h2>
-                   </div>
-                   <button 
-                     onClick={() => setSelectedProject(null)}
-                     className="text-[10px] font-mono text-[#555] hover:text-white transition-colors border border-[#222] px-2 py-1"
-                   >BACK</button>
+              {/* 说明栏 */}
+              <div className="w-full lg:w-[35%] h-1/2 lg:h-full p-12 lg:p-16 overflow-y-auto flex flex-col bg-white/[0.01] border-t lg:border-t-0 lg:border-l border-white/5 order-1 lg:order-none">
+                <div className="mb-14">
+                  <span className="text-klein font-bold text-[13px] tracking-[0.4em] mb-6 block uppercase drop-shadow-[0_0_8px_rgba(0,47,167,0.3)]">ID_{selectedProject.year}</span>
+                  <h2 className="text-3xl font-bold tracking-tight text-white leading-tight mb-6">{selectedProject.title}</h2>
+                  <div className="h-1 w-16 bg-klein rounded-full" />
                 </div>
 
                 <div className="flex flex-col gap-12 flex-grow">
                    <div>
-                      <h4 className="text-[9px] font-mono text-[#333] mb-4 tracking-[0.4em] uppercase border-b border-[#111] pb-2">Role_Definition</h4>
-                      <p className="text-xs text-[#888] font-light leading-relaxed tracking-wider">{selectedProject.role}</p>
+                      <h4 className="text-[10px] font-bold text-silver/30 mb-5 tracking-[0.5em] uppercase border-b border-white/5 pb-3">Objective</h4>
+                      <p className="text-[15px] text-white/90 font-medium leading-relaxed italic">{selectedProject.role}</p>
                    </div>
                    
                    <div>
-                      <h4 className="text-[9px] font-mono text-[#333] mb-4 tracking-[0.4em] uppercase border-b border-[#111] pb-2">Research_Context</h4>
-                      <p className="text-xs text-[#666] font-light leading-relaxed tracking-widest whitespace-pre-line">{selectedProject.description}</p>
+                      <h4 className="text-[10px] font-bold text-silver/30 mb-5 tracking-[0.5em] uppercase border-b border-white/5 pb-3">Case Study</h4>
+                      <p className="text-[15px] text-silver/80 font-light leading-relaxed whitespace-pre-line">{selectedProject.description}</p>
                    </div>
                 </div>
 
@@ -178,10 +180,10 @@ export default function PortfolioContent({ projects }: { projects: any[] }) {
                   <a 
                     href={selectedProject.githubLink} 
                     target="_blank" 
-                    className="mt-16 group flex items-center justify-between border border-[#222] p-4 transition-all hover:border-white/20"
+                    className="mt-16 group flex items-center justify-between bg-klein hover:bg-klein/90 p-6 rounded-2xl transition-all shadow-xl hover:shadow-klein/30"
                   >
-                    <span className="text-[9px] font-mono tracking-[0.5em] uppercase text-[#444] group-hover:text-white transition-colors">Source_Code</span>
-                    <span className="text-xs group-hover:translate-x-1 transition-transform">→</span>
+                    <span className="text-[12px] font-bold tracking-[0.4em] uppercase text-white">View Project Code</span>
+                    <span className="text-2xl transition-transform group-hover:translate-x-2">→</span>
                   </a>
                 )}
               </div>

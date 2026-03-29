@@ -1,13 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #000000;
+  --foreground: #F5f5f7;
+  --apple-gray: #1d1d1f;
+  --apple-silver: #86868b;
+  --klein-blue: #002FA7;
+  --accent-blue: #0071e3; /* 苹果默认蓝 */
+  --card-bg: rgba(29, 29, 31, 0.7);
+  --border-light: rgba(255, 255, 255, 0.12);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-klein: var(--klein-blue);
+  --color-apple: var(--apple-gray);
+  --color-silver: var(--apple-silver);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -17,10 +26,45 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 隐藏滚动条达到极简效果 */
+/* 渐变背景底层 */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% -20%, #1a1a1a 0%, #000 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 文本选取效果 */
+::selection {
+  background: var(--klein-blue);
+  color: white;
+}
+
+/* 隐藏滚动条 */
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
+}
+
+/* 苹果风格模糊辅助类 */
+.glass {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+}
+
+.text-gradient {
+  background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

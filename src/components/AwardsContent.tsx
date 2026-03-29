@@ -5,41 +5,28 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { urlFor } from '@/lib/image';
 
-const LEVEL_NAMES: Record<string, string> = {
-  'intl': '国际级',
-  'national': '国家级',
-  'provincial': '省部级',
-  'city': '市厅级',
-  'school': '院校级',
-  'patent': '专利/著作'
+const LEVEL_NAMES: Record<string, {zh: string, en: string}> = {
+  'intl': { zh: '国际级', en: 'International' },
+  'national': { zh: '国家级', en: 'National' },
+  'provincial': { zh: '省部级', en: 'Provincial' },
+  'city': { zh: '市厅级', en: 'City' },
+  'school': { zh: '院校级', en: 'University' },
+  'patent': { zh: '专利/著作', en: 'Patents' }
 };
 
 export default function AwardsContent({ awards }: { awards: any[] }) {
   const [selectedAward, setSelectedAward] = useState<any | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const springConfig = { type: "spring" as const, stiffness: 300, damping: 30 };
+
   const handleOpenModal = (award: any) => {
     setSelectedAward(award);
     setCurrentImageIndex(0);
   };
 
-  const handleNextMedia = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedAward && selectedAward.media) {
-      setCurrentImageIndex((prev) => (prev + 1) % selectedAward.media.length);
-    }
-  };
-
-  const handlePrevMedia = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedAward && selectedAward.media) {
-      setCurrentImageIndex((prev) => (prev - 1 + selectedAward.media.length) % selectedAward.media.length);
-    }
-  };
-
   const LEVEL_ORDER = ['intl', 'national', 'provincial', 'city', 'school', 'patent'];
 
-  // 严格根据层级顺序排列数据，并收集无法识别的其它数据作为兜底
   const groupedAwards = LEVEL_ORDER.map(levelKey => ({
     id: levelKey,
     name: LEVEL_NAMES[levelKey],
@@ -50,47 +37,61 @@ export default function AwardsContent({ awards }: { awards: any[] }) {
   if (uncategorizedItems.length > 0) {
     groupedAwards.push({
       id: 'other',
-      name: '特殊项',
+      name: { zh: '特殊项', en: 'Honors' },
       items: uncategorizedItems
     });
   }
 
-  // No separation: show all in a minimalist text grid
   return (
-    <div className="pt-24 lg:pt-32 p-8 lg:p-16 min-h-screen bg-[#0a0a0a] z-10 w-full overflow-x-hidden">
-      <header className="mb-16 border-b border-[#111] pb-6 flex justify-between items-end">
-        <div>
-          <h2 className="text-3xl lg:text-4xl font-extralight tracking-[0.2em] uppercase italic text-white flex gap-4 items-center">
-            HONORS & AWARDS
-            <span className="text-[10px] font-mono text-[#333] border border-[#222] px-2 py-1 not-italic">{awards.length} ITEMS</span>
-          </h2>
+    <div className="pt-24 min-h-screen z-10 w-full overflow-x-hidden pb-40">
+      <header className="px-8 lg:px-20 py-20 flex flex-col md:flex-row justify-between items-end gap-8">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-1 bg-klein rounded-full" />
+            <span className="text-[11px] font-bold text-klein tracking-[0.5em] uppercase">Archive_Honors</span>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-bold tracking-tight text-white leading-tight">Awards</h2>
+          <p className="text-silver/60 max-w-md text-sm font-light leading-relaxed">学术荣誉与专利成果归档，展示研究路径的各阶段成果。</p>
         </div>
-        <span className="hidden md:inline-block text-[10px] font-mono text-[#444] tracking-[0.4em] uppercase">Document_Archive</span>
+        <div className="glass px-8 py-3.5 rounded-full border border-white/10 flex items-center gap-6">
+          <div className="flex flex-col items-end">
+            <span className="text-[9px] font-bold text-silver/30 tracking-[0.2em] uppercase">Total Records</span>
+            <span className="text-lg font-bold text-white tracking-widest">{awards.length}</span>
+          </div>
+          <div className="h-6 w-px bg-white/10" />
+          <div className="hidden sm:block">
+            <span className="text-[10px] font-bold text-klein tracking-[0.4em] uppercase">Verified</span>
+          </div>
+        </div>
       </header>
       
-      {/* 按荣誉级别分组网格渲染 */}
-      <div className="flex flex-col gap-16">
+      <div className="flex flex-col gap-28 px-8 lg:px-20">
         {groupedAwards.map((group, groupIndex) => (
           <div key={group.id} className="flex flex-col w-full">
-            {/* 独立的级别标签引导块 */}
-            <div className="flex items-center gap-4 mb-6">
-               <span className="text-[10px] font-mono text-white bg-white/10 border border-[#333] px-3 py-1.5 uppercase tracking-[0.3em]">
-                 {group.name}
-               </span>
-               <div className="flex-grow h-px bg-[#111]" />
-               <span className="text-[9px] font-mono text-[#444] tracking-[0.3em] uppercase">
-                 {group.items.length} RECORDS
-               </span>
+            <div className="flex items-center gap-8 mb-14">
+               <div className="relative group/tag">
+                  <div className="absolute -inset-2 bg-klein/10 blur-xl rounded-full opacity-60 group-hover/tag:opacity-100 transition-opacity" />
+                  <div className="relative flex flex-col items-start px-6 py-2.5 rounded-full border border-white/10 glass">
+                    <span className="text-[12px] font-bold text-white tracking-[0.1em]">{group.name.zh}</span>
+                    <span className="text-[8px] font-bold text-klein tracking-[0.3em] uppercase">{group.name.en}</span>
+                  </div>
+               </div>
+               <div className="flex-grow h-px bg-gradient-to-r from-white/10 to-transparent" />
+               <div className="flex flex-col items-end">
+                  <span className="text-[10px] font-bold text-silver/20 tracking-[0.2em] uppercase">Quantity</span>
+                  <span className="text-xs font-bold text-silver/40 tracking-widest italic">{group.items.length}_ITEMS</span>
+               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {group.items.map((award: any, i: number) => (
                 <motion.div
                   key={award._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: i * 0.05, ease: "easeOut" }}
-                  className={`flex flex-col justify-between p-6 bg-[#050505] border border-[#111] transition-colors ${award.media && award.media.length > 0 ? 'hover:border-white cursor-pointer group' : ''}`}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ y: -8, scale: 1.01 }}
+                  transition={{ duration: 0.8, delay: i * 0.05, ease: [0.23, 1, 0.32, 1] }}
+                  className={`group flex flex-col justify-between p-10 rounded-[40px] glass border border-white/5 transition-all duration-700 hover:shadow-3xl hover:border-white/20 hover:bg-white/[0.04] ${award.media && award.media.length > 0 ? 'cursor-pointer' : ''}`}
                   onClick={() => {
                     if (award.media && award.media.length > 0) {
                       handleOpenModal(award);
@@ -98,19 +99,21 @@ export default function AwardsContent({ awards }: { awards: any[] }) {
                   }}
                 >
                   <div>
-                    <div className="flex justify-between items-start mb-6">
-                      <span className="text-[10px] font-mono text-[#555] tracking-[0.2em]">{award.year}</span>
-                    </div>
-                    <h3 className="text-sm font-light tracking-wider text-[#ccc] leading-relaxed uppercase group-hover:text-white transition-colors">
+                    <span className="text-klein font-bold text-[11px] tracking-[0.4em] mb-4 block uppercase italic drop-shadow-[0_0_8px_rgba(0,47,167,0.3)]">{award.year}</span>
+                    <h3 className="text-lg font-bold tracking-tight text-white/80 leading-[1.6] group-hover:text-white transition-colors">
                       {award.title}
                     </h3>
                   </div>
 
-                  {/* 当存在图片原件时，展示文字暗示组件 */}
                   {award.media && award.media.length > 0 && (
-                    <div className="mt-8 pt-4 border-t border-[#111] flex justify-between items-center text-[9px] font-mono text-[#444] tracking-[0.3em] uppercase group-hover:text-[#888] transition-colors">
-                      <span>Scan Available</span>
-                      <span>[ VIEW ]</span>
+                    <div className="mt-12 pt-8 border-t border-white/5 flex justify-between items-center group/btn">
+                      <div className="flex flex-col">
+                        <span className="text-[9px] font-bold text-silver/20 tracking-[0.2em] uppercase">Evidence</span>
+                        <span className="text-[10px] font-bold text-silver group-hover:text-klein transition-colors uppercase">Scan File</span>
+                      </div>
+                      <div className="w-12 h-12 flex items-center justify-center bg-white/5 group-hover:bg-klein rounded-full text-white transition-all shadow-lg hover:shadow-klein/20">
+                        <span className="text-xl group-hover:translate-x-0.5 transition-transform">→</span>
+                      </div>
                     </div>
                   )}
                 </motion.div>
@@ -120,102 +123,92 @@ export default function AwardsContent({ awards }: { awards: any[] }) {
         ))}
       </div>
 
-      {awards.length === 0 && (
-         <div className="text-center py-32 border border-dashed border-[#222] text-xs font-mono text-[#333] tracking-[0.5em] uppercase">
-            SYSTEM_ERROR: NO_AWARDS_FOUND
-         </div>
-      )}
-
-      {/* 图片原件全屏查看器 (Lightbox Modal) */}
       <AnimatePresence>
         {selectedAward && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 backdrop-blur-xl p-6 lg:p-12 w-screen h-[100dvh]"
-            onClick={() => setSelectedAward(null)}
-          >
-            {/* 顶栏控制 */}
-            <div className="relative w-full max-w-6xl flex justify-between items-center mb-6 z-[110] shrink-0 pointer-events-none">
-              <span className="text-[#888] font-mono text-[9px] tracking-[0.3em] uppercase hidden md:block">Certificate._Scan</span>
-              <button 
-                onClick={(e) => { e.stopPropagation(); setSelectedAward(null); }}
-                className="pointer-events-auto text-white font-mono text-[10px] tracking-widest border border-[#333] bg-black/50 px-4 py-2 hover:bg-white hover:text-black transition-colors ml-auto cursor-pointer"
-                >
-                [ CLOSE ]
-              </button>
-            </div>
-
-            {/* 图片与文字清晰分离：上方图片空间 (带有左右翻页控制) */}
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-12 lg:p-24 overflow-hidden">
+             <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedAward(null)}
+              className="absolute inset-0 bg-black/70 backdrop-blur-xl"
+            />
+            
             <motion.div
-              initial={{ scale: 0.98, opacity: 0, y: 10 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.98, opacity: 0, y: 10 }}
-              transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-              className="relative w-full max-w-6xl flex-grow flex items-center justify-center overflow-hidden border border-[#222] bg-[#050505] group"
-              onClick={e => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.9, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 40 }}
+              transition={springConfig}
+              className="relative w-full max-w-6xl h-full glass rounded-[54px] overflow-hidden flex flex-col shadow-4xl border border-white/20"
             >
-               {selectedAward.media && selectedAward.media.length > 1 && (
-                  <>
-                     <button 
-                       onClick={handlePrevMedia}
-                       className="absolute left-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 border border-[#333] text-white px-4 py-3 font-mono text-[10px] uppercase tracking-widest hover:bg-white hover:text-black"
-                     >
-                       PREV
-                     </button>
-                     <button 
-                       onClick={handleNextMedia}
-                       className="absolute right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 border border-[#333] text-white px-4 py-3 font-mono text-[10px] uppercase tracking-widest hover:bg-white hover:text-black"
-                     >
-                       NEXT
-                     </button>
-                  </>
-               )}
+              <button 
+                onClick={() => setSelectedAward(null)} 
+                className="absolute top-10 right-10 w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-full text-white/80 hover:text-white transition-all z-50 shadow-lg"
+              >
+                <span className="text-2xl leading-none">✕</span>
+              </button>
 
-               <AnimatePresence mode="wait">
-                 <motion.div 
-                   key={currentImageIndex}
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: 1 }}
-                   exit={{ opacity: 0 }}
-                   transition={{ duration: 0.3 }}
-                   className="absolute inset-4 lg:inset-8 flex items-center justify-center"
-                 >
-                   <Image 
-                     src={urlFor(selectedAward.media[currentImageIndex]).url()} 
-                     alt={selectedAward.title} 
-                     fill
-                     className="object-contain shadow-2xl drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]"
-                     unoptimized
-                   />
-                 </motion.div>
-               </AnimatePresence>
-            </motion.div>
+              <div className="h-full flex flex-col">
+                {/* 图片区 */}
+                <div className="flex-grow relative bg-black/40 flex items-center justify-center overflow-hidden group/img p-8 lg:p-20">
+                   <AnimatePresence mode="wait">
+                      <motion.div 
+                        key={currentImageIndex}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ duration: 0.8 }}
+                        className="relative w-full h-full"
+                      >
+                        <Image 
+                          src={urlFor(selectedAward.media[currentImageIndex]).url()} 
+                          alt={selectedAward.title} 
+                          fill
+                          className="object-contain"
+                          unoptimized
+                        />
+                      </motion.div>
+                   </AnimatePresence>
 
-            {/* 图片与文字清晰分离：独立分割的下方文字面板 (增加进度指示器) */}
-            <motion.div 
-               initial={{ opacity: 0, y: 10 }}
-               animate={{ opacity: 1, y: 0 }}
-               exit={{ opacity: 0, y: 10 }}
-               className="relative w-full max-w-6xl mt-6 flex flex-col md:flex-row justify-between items-center bg-[#0a0a0a] border border-[#111] p-6 lg:p-8 shrink-0 z-50 pointer-events-auto"
-               onClick={e => e.stopPropagation()}
-            >
-              <h2 className="text-lg lg:text-xl font-light tracking-widest text-white uppercase text-center md:text-left">
-                {selectedAward.title}
-              </h2>
-              
-              <div className="flex items-center gap-6 mt-4 md:mt-0 shrink-0">
-                {selectedAward.media && selectedAward.media.length > 1 && (
-                  <span className="text-[10px] font-mono text-[#aaa] tracking-[0.2em] px-3 py-1 border border-[#333]">
-                    {currentImageIndex + 1} / {selectedAward.media.length}
-                  </span>
-                )}
-                <span className="text-[10px] font-mono text-[#666] tracking-[0.3em]">{selectedAward.year}</span>
+                   {selectedAward.media.length > 1 && (
+                      <>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(p => (p > 0 ? p - 1 : selectedAward.media.length - 1)); }}
+                          className="absolute left-10 w-16 h-16 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center text-3xl font-light transition-all opacity-0 group-hover/img:opacity-100"
+                        >←</button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(p => (p + 1) % selectedAward.media.length); }}
+                          className="absolute right-10 w-16 h-16 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center text-3xl font-light transition-all opacity-0 group-hover/img:opacity-100"
+                        >→</button>
+                      </>
+                   )}
+                </div>
+
+                {/* 底部信息栏 */}
+                <div className="p-12 lg:p-16 bg-white/[0.02] border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-1.5 h-6 bg-klein rounded-full animate-glow" />
+                      <span className="text-[11px] font-bold text-klein tracking-[0.4em] uppercase">Document Verified</span>
+                    </div>
+                    <h3 className="text-2xl lg:text-3xl font-bold tracking-tight text-white leading-tight">{selectedAward.title}</h3>
+                  </div>
+
+                  <div className="flex items-center gap-12">
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] font-bold text-silver/30 uppercase tracking-[0.3em] mb-2">Award Date</span>
+                      <span className="text-2xl font-bold text-white tracking-widest">{selectedAward.year}</span>
+                    </div>
+                    {selectedAward.media.length > 1 && (
+                      <div className="glass px-6 py-3 rounded-full border border-white/10 text-[12px] font-bold text-white/60">
+                         {currentImageIndex + 1} <span className="opacity-20 px-2">/</span> {selectedAward.media.length}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
